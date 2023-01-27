@@ -12,7 +12,7 @@ class OnBoardingViewModel extends BaseViewModel
       StreamController<SliderViewObject>();
 
   late final List<SliderObject> _list;
-  final int _currentIndex = 0;
+  int _currentIndex = 0;
   @override
   void dispose() {
     _streamController.close();
@@ -26,18 +26,28 @@ class OnBoardingViewModel extends BaseViewModel
 
   @override
   void goNext() {
-    // TODO: implement goNext
+    int nextIndex = _currentIndex++;
+    if (nextIndex >= _list.length) {
+      _currentIndex = 0;
+    }
+    _postDataToView();
   }
 
   @override
   void goPrevious() {
-    // TODO: implement goPrevious
+    int previousIndex = _currentIndex--;
+    if (previousIndex == -1) {
+      _currentIndex = _list.length - 1;
+    }
+    _postDataToView();
   }
 
   @override
   void onPageChanged(int index) {
-    // TODO: implement onPageChanged
+    _currentIndex = index;
+    _postDataToView();
   }
+
   //input
   @override
   Sink get inputSliderViewObject => throw _streamController.sink;
