@@ -14,4 +14,5 @@ class AppString {
       'Tut App is An Awosem Application clean Architecture #3';
   static const String onboardingSubtitle4 =
       'Tut App is An Awosem Application clean Architecture #4';
+  static const String skip = 'Skip';
 }
