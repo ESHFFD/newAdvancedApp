@@ -19,9 +19,9 @@ class OnBoardingView extends StatefulWidget {
 
 class _OnBoardingViewState extends State<OnBoardingView> {
   final PageController _pageController = PageController(initialPage: 0);
-  OnBoardingViewModel viewModel = OnBoardingViewModel();
+  final OnBoardingViewModel _viewModel = OnBoardingViewModel();
   _bind() {
-    viewModel.start();
+    _viewModel.start();
   }
 
   @override
@@ -32,17 +32,25 @@ class _OnBoardingViewState extends State<OnBoardingView> {
 
   @override
   void dispose() {
-    viewModel.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return contentWidget();
+    return StreamBuilder<SliderViewObject>(
+        stream: _viewModel.outputSliderViewOject,
+        builder: (context, snapshot) {
+          return contentWidget(snapshot.data, _pageController, _viewModel);
+        });
   }
 }
 
-Widget contentWidget() {
+Widget contentWidget(SliderViewObject? sliderViewObject,
+    PageController pageController, OnBoardingViewModel viewModel) {
+  if (sliderViewObject == null) {
+    return Container();
+  }
   return Scaffold(
     appBar: AppBar(
       backgroundColor: ColorManagement.grey,
@@ -57,14 +65,14 @@ Widget contentWidget() {
     ),
     backgroundColor: ColorManagement.white,
     body: PageView.builder(
-        controller: _pageController,
-        itemCount: _list.length,
-        onPageChanged: (value) => setState(() {
-              widget.currentIndex = value;
-            }),
+        controller: pageController,
+        itemCount: sliderViewObject.numOfSlides,
+        onPageChanged: (value) {
+          viewModel.onPageChanged(value);
+        },
         itemBuilder: (context, index) {
           return OnBoardingPage(
-            sliderObject: _list[index],
+            sliderObject: sliderViewObject.sliderObject,
           );
         }),
     bottomSheet: SizedBox(
@@ -73,21 +81,24 @@ Widget contentWidget() {
         Align(
           alignment: Alignment.centerRight,
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              // Navigator.pushReplacementNamed(context, Rou)
+            },
             child: const Text(
               AppString.skip,
               textAlign: TextAlign.end,
             ),
           ),
         ),
-        _getBottomSheet(_list, widget.currentIndex, _pageController)
+        Expanded(
+            child: _getBottomSheet(pageController, sliderViewObject, viewModel))
       ]),
     ),
   );
 }
 
-Widget _getBottomSheet(
-    List objectList, int selectIndex, PageController pageController) {
+Widget _getBottomSheet(PageController pageController,
+    SliderViewObject sliderViewObject, OnBoardingViewModel viewModel) {
   return Container(
     height: 50,
     color: ColorManagement.primary,
@@ -104,19 +115,16 @@ Widget _getBottomSheet(
               child: SvgPicture.asset(AssetsImage.leftArrowIc),
             ),
             onTap: () {
-              pageController.animateToPage(
-                  _getPreviousPage(selectIndex, objectList),
-                  duration: const Duration(milliseconds: DurationConstant.d300),
-                  curve: Curves.easeIn);
+              viewModel.goPrevious();
             },
           ),
         ),
         //Circluar part
         Row(children: [
-          for (int i = 0; i < objectList.length; i++)
+          for (int i = 0; i < sliderViewObject.numOfSlides; i++)
             Padding(
               padding: const EdgeInsets.all(AppSize.s14),
-              child: _getProperCircle(i, selectIndex),
+              child: _getProperCircle(i, sliderViewObject.currentIndex),
             )
         ]),
 
@@ -130,10 +138,7 @@ Widget _getBottomSheet(
               child: SvgPicture.asset(AssetsImage.rightArrowIc),
             ),
             onTap: () {
-              pageController.animateToPage(
-                  _getNextPage(selectIndex, objectList),
-                  duration: const Duration(milliseconds: DurationConstant.d300),
-                  curve: Curves.easeIn);
+              viewModel.goNext();
             },
           ),
         ),
