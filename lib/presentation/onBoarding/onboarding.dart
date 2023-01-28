@@ -53,7 +53,6 @@ Widget contentWidget(SliderViewObject? sliderViewObject,
   }
   return Scaffold(
     appBar: AppBar(
-      backgroundColor: ColorManagement.grey,
       elevation: AppSize.s0,
       systemOverlayStyle: const SystemUiOverlayStyle(
           systemNavigationBarDividerColor: Colors.red,
@@ -130,12 +129,16 @@ Widget _getBottomSheet(PageController pageController,
 
         //right arrow
         Padding(
-          padding: const EdgeInsets.all(AppPadding.p14),
+          padding: const EdgeInsets.symmetric(horizontal: 50),
           child: GestureDetector(
             child: SizedBox(
               height: AppSize.s14,
               width: AppSize.s14,
-              child: SvgPicture.asset(AssetsImage.rightArrowIc),
+              child: SvgPicture.asset(
+                AssetsImage.rightArrowIc,
+                width: 10,
+                height: 10,
+              ),
             ),
             onTap: () {
               viewModel.goNext();
