@@ -33,10 +33,10 @@ class Contacts {
 }
 
 class Authentication {
-  Customers customers;
-  Contacts contacts;
+  Customers? customers;
+  Contacts? contacts;
   Authentication({
-    required this.customers,
-    required this.contacts,
+    this.customers,
+    this.contacts,
   });
 }
